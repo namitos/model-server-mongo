@@ -35,7 +35,7 @@ module.exports = function (app) {
 						resolve(model);
 					}).catch((err) => {
 						reject({
-							type: 'insert',
+							type: 'create',
 							data: err.toString()
 						});
 					});
@@ -83,8 +83,16 @@ module.exports = function (app) {
 		delete() {
 			var model = this;
 			return new Promise((resolve, reject) => {
-				var data = model.toJSON();
-				//TODO: implement
+				app.db.collection(model.constructor.schema.name).deleteOne({
+					_id: model._id
+				}).then(function () {
+					resolve();
+				}).catch(function (err) {
+					reject({
+						type: 'delete',
+						data: err
+					});
+				});
 			});
 		}
 
