@@ -115,6 +115,24 @@ module.exports = function (app) {
 			});
 		}
 
+		static byId(id, options, connections) {
+			var This = this;
+			return this.read({
+				_id: app.util.prepareId(id)
+			}, options, connections).then(function (result) {
+				return new Promise(function (resolve, reject) {
+					if (result.length) {
+						resolve(result[0]);
+					} else {
+						reject({
+							type: 'read',
+							data: 'item not found'
+						})
+					}
+				});
+			});
+		}
+
 		//TODO: возможно, надо сделать статический метод апдейта
 		/*static update() {
 
