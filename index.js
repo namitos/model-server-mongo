@@ -6,7 +6,7 @@ module.exports = function (app) {
 	return class Model {
 		constructor(properties) {
 			var model = this;
-			Object.keys(properties).forEach((prop) => {
+			Object.keys(properties).forEach(function (prop) {
 				model[prop] = properties[prop];
 			});
 			if (model._id) {
@@ -17,7 +17,7 @@ module.exports = function (app) {
 		toJSON() {
 			var model = this;
 			var result = {};
-			Object.keys(this).forEach((prop) => {
+			Object.keys(this).forEach(function (prop) {
 				result[prop] = model[prop];
 			});
 			return result;
@@ -25,15 +25,15 @@ module.exports = function (app) {
 
 		create() {
 			var model = this;
-			return new Promise((resolve, reject) => {
+			return new Promise(function (resolve, reject) {
 				//todo: сделать приведение типов
 				var data = model.toJSON();
 				var validation = revalidator.validate(data, model.constructor.schema);
 				if (validation.valid) {
-					app.db.collection(model.constructor.schema.name).insertOne(data).then((result) => {
+					app.db.collection(model.constructor.schema.name).insertOne(data).then(function (result) {
 						model._id = result.ops[0]._id;
 						resolve(model);
-					}).catch((err) => {
+					}).catch(function (err) {
 						reject({
 							type: 'create',
 							data: err.toString()
@@ -50,7 +50,7 @@ module.exports = function (app) {
 
 		update() {
 			var model = this;
-			return new Promise((resolve, reject) => {
+			return new Promise(function (resolve, reject) {
 				var data = model.toJSON();
 				//todo: сделать приведение типов
 				var validation = revalidator.validate(data, model.constructor.schema);
@@ -82,7 +82,7 @@ module.exports = function (app) {
 
 		delete() {
 			var model = this;
-			return new Promise((resolve, reject) => {
+			return new Promise(function (resolve, reject) {
 				app.db.collection(model.constructor.schema.name).deleteOne({
 					_id: model._id
 				}).then(function () {
@@ -98,12 +98,12 @@ module.exports = function (app) {
 
 		static read(where, options, connections) {
 			var This = this;
-			return new Promise((resolve, reject) => {
-				////todo: тут надо делать подтягивание связей
+			return new Promise(function (resolve, reject) {
+				//TODO: тут надо делать подтягивание связей
 				where = where || {};
 				options = options || {};
-				app.db.collection(This.schema.name).find(where, options).toArray().then((result) => {
-					resolve(result.map((row) => {
+				app.db.collection(This.schema.name).find(where, options).toArray().then(function (result) {
+					resolve(result.map(function (row) {
 						return new This(row);
 					}));
 				}).catch(function (err) {

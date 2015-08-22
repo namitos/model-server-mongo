@@ -2,16 +2,15 @@
   "name": "model-server-mongo",
   "version": "1.0.0",
   "description": "",
-  "main": "Model.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/namitos/Model-server-mongo.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Artem Tankayan",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/namitos/Model-server-mongo/issues"
   },
