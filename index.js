@@ -26,8 +26,8 @@ module.exports = function (app) {
 		create() {
 			var model = this;
 			return new Promise(function (resolve, reject) {
-				//todo: сделать приведение типов
 				var data = model.toJSON();
+				data = app.util.forceSchema(model.constructor.schema, data);
 				var validation = revalidator.validate(data, model.constructor.schema);
 				if (validation.valid) {
 					app.db.collection(model.constructor.schema.name).insertOne(data).then(function (result) {
@@ -52,7 +52,7 @@ module.exports = function (app) {
 			var model = this;
 			return new Promise(function (resolve, reject) {
 				var data = model.toJSON();
-				//todo: сделать приведение типов
+				data = app.util.forceSchema(model.constructor.schema, data);
 				var validation = revalidator.validate(data, model.constructor.schema);
 				if (validation.valid) {
 					if (model.constructor.schema.updatePatch) {
@@ -82,18 +82,23 @@ module.exports = function (app) {
 
 		delete() {
 			var model = this;
-			return new Promise(function (resolve, reject) {
-				app.db.collection(model.constructor.schema.name).deleteOne({
-					_id: model._id
-				}).then(function () {
-					resolve();
-				}).catch(function (err) {
-					reject({
-						type: 'delete',
-						data: err
+			if (This.schema.safeDelete) {
+				this.deleted = true;
+				return this.update();
+			} else {
+				return new Promise(function (resolve, reject) {
+					app.db.collection(model.constructor.schema.name).deleteOne({
+						_id: model._id
+					}).then(function () {
+						resolve();
+					}).catch(function (err) {
+						reject({
+							type: 'delete',
+							data: err
+						});
 					});
 				});
-			});
+			}
 		}
 
 		static read(where, options, connections) {
@@ -132,12 +137,5 @@ module.exports = function (app) {
 				});
 			});
 		}
-
-		//TODO: возможно, надо сделать статический метод апдейта
-		/*static update() {
-
-		 }*/
-
-
 	};
 };
