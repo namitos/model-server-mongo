@@ -82,9 +82,9 @@ module.exports = function (app) {
 
 		delete() {
 			var model = this;
-			if (This.schema.safeDelete) {
-				this.deleted = true;
-				return this.update();
+			if (model.constructor.schema.safeDelete) {
+				model.deleted = true;
+				return model.update();
 			} else {
 				return new Promise(function (resolve, reject) {
 					app.db.collection(model.constructor.schema.name).deleteOne({
@@ -121,7 +121,6 @@ module.exports = function (app) {
 		}
 
 		static byId(id, options, connections) {
-			var This = this;
 			return this.read({
 				_id: app.util.prepareId(id)
 			}, options, connections).then(function (result) {
