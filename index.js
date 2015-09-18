@@ -23,22 +23,13 @@ module.exports = function (app) {
 			return result;
 		}
 
-		create() {
+		prepare() {
 			var model = this;
 			return new Promise(function (resolve, reject) {
-				var data = model.toJSON();
-				data = app.util.forceSchema(model.constructor.schema, data);
+				var data = app.util.forceSchema(model.constructor.schema, model);
 				var validation = revalidator.validate(data, model.constructor.schema);
 				if (validation.valid) {
-					app.db.collection(model.constructor.schema.name).insertOne(data).then(function (result) {
-						model._id = result.ops[0]._id;
-						resolve(model);
-					}).catch(function (err) {
-						reject({
-							type: 'create',
-							data: err.toString()
-						});
-					});
+					resolve(data);
 				} else {
 					reject({
 						type: 'validation',
@@ -48,35 +39,33 @@ module.exports = function (app) {
 			});
 		}
 
+		create() {
+			var model = this;
+			return model.prepare().then(function (data) {
+				return app.db.collection(model.constructor.schema.name).insertOne(data);
+			}).then(function (result) {
+				return new Promise(function (resolve) {
+					model._id = result.ops[0]._id;
+					resolve(model);
+				});
+			});
+		}
+
 		update() {
 			var model = this;
-			return new Promise(function (resolve, reject) {
-				var data = model.toJSON();
-				data = app.util.forceSchema(model.constructor.schema, data);
-				var validation = revalidator.validate(data, model.constructor.schema);
-				if (validation.valid) {
-					if (model.constructor.schema.updatePatch) {
-						data = {
-							$set: data
-						};
-					}
-					app.db.collection(model.constructor.schema.name).updateOne({
-						_id: model._id
-					}, data).then(function (result) {
-						console.log('model', model);
-						resolve(model);
-					}).catch(function (err) {
-						reject({
-							type: 'update',
-							data: err
-						});
-					});
-				} else {
-					reject({
-						type: 'validation',
-						data: validation.errors
-					});
+			return model.prepare().then(function (data) {
+				if (model.constructor.schema.updatePatch) {
+					data = {
+						$set: data
+					};
 				}
+				return app.db.collection(model.constructor.schema.name).updateOne({
+					_id: model._id
+				}, data).then(function () {
+					return new Promise(function (resolve) {
+						resolve(model);
+					});
+				});
 			});
 		}
 
@@ -86,17 +75,8 @@ module.exports = function (app) {
 				model.deleted = true;
 				return model.update();
 			} else {
-				return new Promise(function (resolve, reject) {
-					app.db.collection(model.constructor.schema.name).deleteOne({
-						_id: model._id
-					}).then(function () {
-						resolve();
-					}).catch(function (err) {
-						reject({
-							type: 'delete',
-							data: err
-						});
-					});
+				return app.db.collection(model.constructor.schema.name).deleteOne({
+					_id: model._id
 				});
 			}
 		}
@@ -112,10 +92,7 @@ module.exports = function (app) {
 						return new This(row);
 					}));
 				}).catch(function (err) {
-					reject({
-						type: 'read',
-						data: err.toString()
-					});
+					reject(err);
 				});
 			});
 		}
@@ -128,10 +105,7 @@ module.exports = function (app) {
 					if (result.length) {
 						resolve(result[0]);
 					} else {
-						reject({
-							type: 'read',
-							data: 'item not found'
-						})
+						reject('item not found');
 					}
 				});
 			});
