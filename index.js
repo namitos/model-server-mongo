@@ -23,7 +23,7 @@ module.exports = function (app) {
 			return result;
 		}
 
-		prepare() {
+		prepare(op) {
 			var model = this;
 			return new Promise(function (resolve, reject) {
 				var data = app.util.forceSchema(model.constructor.schema, model);
@@ -41,7 +41,7 @@ module.exports = function (app) {
 
 		create() {
 			var model = this;
-			return model.prepare().then(function (data) {
+			return model.prepare('create').then(function (data) {
 				return app.db.collection(model.constructor.schema.name).insertOne(data);
 			}).then(function (result) {
 				return new Promise(function (resolve) {
@@ -53,7 +53,7 @@ module.exports = function (app) {
 
 		update() {
 			var model = this;
-			return model.prepare().then(function (data) {
+			return model.prepare('update').then(function (data) {
 				if (model.constructor.schema.updatePatch) {
 					data = {
 						$set: data
