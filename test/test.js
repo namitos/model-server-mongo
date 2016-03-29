@@ -5,7 +5,9 @@ var mongodb = require('mongodb');
 var factory = require('../');
 
 function init() {
-	return mongodb.MongoClient.connect('mongodb://127.0.0.1:27017/test').then(function (db) {
+	return mongodb.MongoClient.connect('mongodb://test:pass@127.0.0.1:27017/test-msm', {
+		uri_decode_auth: true
+	}).then(function (db) {
 		var Model = factory({db: db});
 		return class TestModel extends Model {
 			static get schema() {
