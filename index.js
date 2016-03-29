@@ -2,6 +2,7 @@
 
 var revalidator = require('revalidator');
 var _ = require('lodash');
+var mongodb = require('mongodb');
 
 class Collection extends Array {
 	/**
@@ -44,7 +45,7 @@ module.exports = (app) => {
 				this[prop] = properties[prop];
 			});
 			if (this._id) {
-				this._id = app.util.prepareId(this._id);
+				this._id = this.constructor.prepareId(this._id);
 			}
 		}
 
@@ -85,7 +86,7 @@ module.exports = (app) => {
 		 */
 		prepare(op) {
 			return new Promise((resolve, reject) => {
-				var data = app.util.forceSchema(this.constructor.schema, this);
+				var data = this.constructor.forceSchema(this.constructor.schema, this);
 				var validation = revalidator.validate(data, this.constructor.schema);
 				if (validation.valid) {
 					resolve(data);
@@ -178,7 +179,7 @@ module.exports = (app) => {
 		 * @returns {Promise}
 		 */
 		static byId(id, options, connections) {
-			return this.by('_id', app.util.prepareId(id), options, connections);
+			return this.by('_id', this.constructor.prepareId(id), options, connections);
 		}
 
 		/**
@@ -202,5 +203,69 @@ module.exports = (app) => {
 				});
 			});
 		}
+
+		static prepareId(id) {
+			var newId;
+			try {
+				if (id instanceof Array) {
+					newId = [];
+					id.forEach((item, i) => {
+						newId.push(this.prepareId(item));
+					});
+				} else if (id instanceof Object && id.hasOwnProperty('$in')) {
+					newId = {
+						$in: this.prepareId(id.$in)
+					};
+				} else {
+					newId = new mongodb.ObjectID(id.toString());
+				}
+			} catch (err) {
+				console.error(id, err);
+			}
+			return newId;
+		}
+
+		static forceSchema(schema, obj) {
+			var objNew;
+			if (schema.type == 'array') {
+				objNew = [];
+				if (obj instanceof Array) {
+					_.compact(obj).forEach((val, key) => {
+						objNew[key] = this.forceSchema(schema.items, val);
+					});
+				} else {
+					objNew = null;
+				}
+			} else if (schema.type == 'object') {
+				objNew = {};
+				if (obj instanceof Object) {
+					_.forEach(schema.properties, (schemaPart, key) => {
+						if (obj.hasOwnProperty(key)) {
+							objNew[key] = this.forceSchema(schemaPart, obj[key]);
+						}
+					});
+				} else {
+					objNew = null;
+				}
+			} else if (schema.type == 'integer') {
+				objNew = parseInt(obj);
+				if (isNaN(objNew)) {
+					objNew = 0;
+				}
+			} else if (schema.type == 'number') {
+				objNew = parseFloat(obj);
+				if (isNaN(objNew)) {
+					objNew = 0;
+				}
+			} else if (schema.type == 'string') {
+				objNew = obj ? obj.toString() : '';
+			} else if (schema.type == 'boolean') {
+				objNew = !_.includes([false, 0, '', '0', 'false', null], obj);
+			} else if (schema.type == 'any') {
+				objNew = obj;
+			}
+			return objNew;
+		}
+
 	};
 };

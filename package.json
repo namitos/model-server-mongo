@@ -1,22 +1,29 @@
 {
-  "name": "model-server-mongo",
-  "version": "1.1.1",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/namitos/Model-server-mongo.git"
-  },
-  "author": "Artem Tankayan",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/namitos/Model-server-mongo/issues"
-  },
-  "homepage": "https://github.com/namitos/Model-server-mongo#readme",
-  "dependencies": {
-    "revalidator": "0.3.x",
-    "lodash": "4.x"
-  }
+	"name": "model-server-mongo",
+	"version": "1.1.2",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "./node_modules/mocha/bin/mocha ./test/* --timeout 10000",
+		"test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/namitos/Model-server-mongo.git"
+	},
+	"author": "Artem Tankayan",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/namitos/Model-server-mongo/issues"
+	},
+	"homepage": "https://github.com/namitos/Model-server-mongo#readme",
+	"dependencies": {
+		"mongodb": "2.x",
+		"revalidator": "0.3.x",
+		"lodash": "4.x"
+	},
+	"devDependencies": {
+		"mocha": "2.x",
+		"istanbul": "0.4.x"
+	}
 }
