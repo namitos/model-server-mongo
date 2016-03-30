@@ -179,7 +179,7 @@ module.exports = (app) => {
 		 * @returns {Promise}
 		 */
 		static byId(id, options, connections) {
-			return this.by('_id', this.constructor.prepareId(id), options, connections);
+			return this.by('_id', this.prepareId(id), options, connections);
 		}
 
 		/**
