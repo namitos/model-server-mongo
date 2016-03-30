@@ -4,7 +4,10 @@ node_js:
   - "5"
 services:
   - mongodb
+env:
+  - DBAUTH=test:pass@
 before_script:
   - sleep 15
   - mongo test-msm --eval 'db.addUser("test", "pass");'
 script: "npm run-script test-travis"
+after_script: "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"

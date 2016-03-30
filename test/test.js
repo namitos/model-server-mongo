@@ -1,11 +1,13 @@
 'use strict';
 
+process.env.DBAUTH = process.env.DBAUTH || '';
+
 var assert = require('assert');
 var mongodb = require('mongodb');
 var factory = require('../');
 
 function init() {
-	return mongodb.MongoClient.connect('mongodb://test:pass@127.0.0.1:27017/test-msm', {
+	return mongodb.MongoClient.connect('mongodb://' + process.env.DBAUTH + '127.0.0.1:27017/test-msm', {
 		uri_decode_auth: true
 	}).then(function (db) {
 		var Model = factory({db: db});
