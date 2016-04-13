@@ -260,7 +260,8 @@ module.exports = (app) => {
 			} else if (schema.type == 'string') {
 				objNew = obj ? obj.toString() : '';
 			} else if (schema.type == 'boolean') {
-				objNew = !_.includes([false, 0, '', '0', 'false', null, undefined], obj);
+				var undVar;
+				objNew = !_.includes([false, 0, '', '0', 'false', null, undVar], obj);
 			} else if (schema.type == 'any') {
 				objNew = obj;
 			}

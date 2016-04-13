@@ -19,6 +19,9 @@ function init() {
 						a: {
 							type: 'integer'
 						},
+						aa: {
+							type: 'number'
+						},
 						b: {
 							type: 'string'
 						},
@@ -41,14 +44,30 @@ describe('Model-server-mongo', function () {
 
 	it('forceSchema', function (done) {
 		init().then(function (TestModel) {
-			var obj = TestModel.forceSchema(TestModel.schema, {
-				a: '1',
-				b: 1,
-				c: '0'
-			});
-			assert.equal(true, obj.a === 1);
-			assert.equal(true, obj.b === '1');
-			assert.equal(true, obj.c === false);
+			assert.equal(999, TestModel.forceSchema(TestModel.schema, {a: 999}).a);
+			assert.equal(999, TestModel.forceSchema(TestModel.schema, {a: '999'}).a);
+			assert.equal(999, TestModel.forceSchema(TestModel.schema, {a: '999.999'}).a);
+
+			assert.equal(999.999, TestModel.forceSchema(TestModel.schema, {aa: '999.999'}).aa);
+
+			assert.equal('999.999', TestModel.forceSchema(TestModel.schema, {b: 999.999}).b);
+
+			var undVar;
+			var obj = {};
+			obj.c = undVar;
+			assert.equal(false, TestModel.forceSchema(TestModel.schema, obj).c);
+			assert.equal(false, TestModel.forceSchema(TestModel.schema, {c: '0'}).c);
+			assert.equal(false, TestModel.forceSchema(TestModel.schema, {c: 'false'}).c);
+			assert.equal(false, TestModel.forceSchema(TestModel.schema, {c: ''}).c);
+			assert.equal(false, TestModel.forceSchema(TestModel.schema, {c: false}).c);
+			assert.equal(false, TestModel.forceSchema(TestModel.schema, {c: null}).c);
+
+			assert.equal(true, TestModel.forceSchema(TestModel.schema, {c: {}}).c);
+			assert.equal(true, TestModel.forceSchema(TestModel.schema, {c: '1'}).c);
+			assert.equal(true, TestModel.forceSchema(TestModel.schema, {c: 'true'}).c);
+			assert.equal(true, TestModel.forceSchema(TestModel.schema, {c: '999'}).c);
+			assert.equal(true, TestModel.forceSchema(TestModel.schema, {c: true}).c);
+
 			done();
 		}).catch(done);
 	});
