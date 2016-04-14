@@ -114,18 +114,19 @@ module.exports = (app) => {
 
 		/**
 		 *
-		 * @returns {Promise}
+		 * @param where - sometimes we need in additional conditions in query.
+		 * @returns {Promise.}
 		 */
-		update() {
+		update(where) {
 			return this.prepare('update').then((data) => {
 				if (this.constructor.schema.updatePatch) {
 					data = {
 						$set: data
 					};
 				}
-				return app.db.collection(this.constructor.schema.name).updateOne({
+				return app.db.collection(this.constructor.schema.name).updateOne(_.merge(where || {}, {
 					_id: this._id
-				}, data).then(() => {
+				}), data).then(() => {
 					return this;
 				});
 			});
@@ -133,16 +134,17 @@ module.exports = (app) => {
 
 		/**
 		 *
+		 * @param where - sometimes we need in additional conditions in query. for example, to update the record of a particular user, to avoid reading the document and comparison.
 		 * @returns {Promise}
 		 */
-		delete() {
+		delete(where) {
 			if (this.constructor.schema.safeDelete) {
 				this.deleted = true;
-				return this.update();
+				return this.update(where);
 			} else {
-				return app.db.collection(this.constructor.schema.name).deleteOne({
+				return app.db.collection(this.constructor.schema.name).deleteOne(_.merge(where || {}, {
 					_id: this._id
-				});
+				}));
 			}
 		}
 

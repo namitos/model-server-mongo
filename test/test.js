@@ -15,6 +15,7 @@ function init() {
 			static get schema() {
 				return {
 					type: 'object',
+					name: 'TestModel',
 					properties: {
 						a: {
 							type: 'integer'
@@ -89,6 +90,78 @@ describe('Model-server-mongo', function () {
 			assert.equal(true, ids.$in[0] instanceof mongodb.ObjectID);
 
 			done();
+		}).catch(done);
+	});
+
+	it('create', function (done) {
+		init().then(function (TestModel) {
+			return new TestModel({
+				a: 11,
+				aa: 11.11,
+				b: 'foo',
+				c: true
+			}).create()
+		}).then(function (item) {
+			assert.equal(true, item._id instanceof mongodb.ObjectID);
+			done();
+		}).catch(done);
+	});
+
+	it('update', function (done) {
+		var TestModel;
+		init().then(function (TestModel) {
+			return new TestModel({
+				a: 22,
+				aa: 22.22,
+				b: 'foo',
+				c: true
+			}).create().then(function (item) {
+				item.a = 22222;
+				return item.update();
+			}).then(function (item) {
+				return TestModel.byId(item._id);//читаем из базы заново, чтоб убедиться
+			}).then(function (item) {
+				assert.equal(22222, item.a);
+				done();
+			});
+		}).catch(done);
+	});
+
+	it('update (additional conditions 1)', function (done) {
+		init().then(function (TestModel) {
+			return new TestModel({
+				a: 22,
+				aa: 22.22,
+				b: 'foo',
+				c: true
+			}).create().then(function (item) {
+				item.a = 22222;
+				return item.update({aa: 22.22});//заведомо существующее условие
+			}).then(function (item) {
+				return TestModel.byId(item._id);//читаем из базы заново, чтоб убедиться
+			}).then(function (item) {
+				assert.equal(22222, item.a);//должно обновиться
+				done();
+			});
+		}).catch(done);
+	});
+
+	it('update (additional conditions 2)', function (done) {
+		init().then(function (TestModel) {
+			return new TestModel({
+				a: 22,
+				aa: 22.22,
+				b: 'foo',
+				c: true
+			}).create().then(function (item) {
+				item.a = 22222;
+				return item.update({aa: 9});//заведомо несуществующее условие
+			}).then(function (item) {
+				return TestModel.byId(item._id);//читаем из базы заново, чтоб убедиться
+			}).then(function (item) {
+				assert.equal(22, item.a);//не должно обновиться
+				done();
+			});
 		}).catch(done);
 	});
 });
