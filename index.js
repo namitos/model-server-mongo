@@ -39,16 +39,34 @@ module.exports = (app) => {
 			return _.set(this, path);
 		}
 
+		static _toJSON(obj) {
+			var result;
+
+			if (obj instanceof mongodb.ObjectId) {
+				result = obj.toString();
+			} else if (obj instanceof Object) {
+				result = {};
+				Object.keys(obj).forEach((prop) => {
+					result[prop] = this._toJSON(obj[prop]);
+				});
+			} else if (obj instanceof Array) {
+				result = [];
+				obj.forEach((item) => {
+					result.push(this._toJSON(item));
+				});
+			} else {
+				result = obj;
+			}
+
+			return result;
+		}
+
 		/**
 		 *
 		 * @returns {Object}
 		 */
 		toJSON() {
-			var result = {};
-			Object.keys(this).forEach((prop) => {
-				result[prop] = this[prop];
-			});
-			return result;
+			return this.constructor._toJSON(this);
 		}
 
 		/**
