@@ -1,11 +1,12 @@
 {
 	"name": "model-server-mongo",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "",
 	"main": "index.js",
 	"scripts": {
 		"test": "./node_modules/mocha/bin/mocha ./test/* --timeout 10000",
-		"test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*"
+		"test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*",
+		"docs": "rm -rf out/ && ./node_modules/jsdoc/jsdoc.js *.js"
 	},
 	"repository": {
 		"type": "git",
@@ -25,6 +26,7 @@
 	"devDependencies": {
 		"mocha": "2.x",
 		"istanbul": "0.4.x",
-		"coveralls": "2.x"
+		"coveralls": "2.x",
+		"jsdoc": "3.x"
 	}
 }

@@ -4,41 +4,13 @@ var revalidator = require('revalidator');
 var _ = require('lodash');
 var mongodb = require('mongodb');
 
-class Collection extends Array {
-	/**
-	 *
-	 * @param items
-	 * @param Model
-	 * @returns {Collection}
-	 */
-	wrap(items, Model) {
-		if (items && items.length) {
-			items.forEach((item) => {
-				if (item instanceof Model) {
-					this.push(item);
-				} else {
-					this.push(new Model(item));
-				}
-			});
-		}
-		return this;
-	}
-
-	/**
-	 *
-	 * lodash wrapper
-	 * @returns {*}
-	 */
-	get _() {
-		return _(this);
-	}
-}
+var Collection = require('./Collection');
 
 module.exports = (app) => {
 	return class Model {
 		/**
-		 *
-		 * @param properties
+		 * @constructor
+		 * @param {Object} properties
 		 */
 		constructor(properties) {
 			Object.keys(properties).forEach((prop) => {
@@ -51,7 +23,7 @@ module.exports = (app) => {
 
 		/**
 		 * useful wrapper for getting values of deep objects
-		 * @param path
+		 * @param {string} path
 		 * @returns {*}
 		 */
 		get(path) {
@@ -60,8 +32,8 @@ module.exports = (app) => {
 
 		/**
 		 * useful wrapper for setting values of deep objects
-		 * @param path
-		 * @returns {Object}
+		 * @param {string} path
+		 * @returns {*}
 		 */
 		set(path) {
 			return _.set(this, path);
@@ -69,7 +41,7 @@ module.exports = (app) => {
 
 		/**
 		 *
-		 * @returns {{Object}}
+		 * @returns {Object}
 		 */
 		toJSON() {
 			var result = {};
@@ -81,7 +53,7 @@ module.exports = (app) => {
 
 		/**
 		 * prepares the object to database
-		 * @param op
+		 * @param {string} op
 		 * @returns {Promise}
 		 */
 		prepare(op) {
@@ -114,8 +86,8 @@ module.exports = (app) => {
 
 		/**
 		 *
-		 * @param where - sometimes we need in additional conditions in query.
-		 * @returns {Promise.}
+		 * @param {Object} where - sometimes we need in additional conditions in query.
+		 * @returns {Promise}
 		 */
 		update(where) {
 			return this.prepare('update').then((data) => {
@@ -134,7 +106,7 @@ module.exports = (app) => {
 
 		/**
 		 *
-		 * @param where - sometimes we need in additional conditions in query. for example, to update the record of a particular user, to avoid reading the document and comparison.
+		 * @param {Object} where - sometimes we need in additional conditions in query. for example, to update the record of a particular user, to avoid reading the document and comparison.
 		 * @returns {Promise}
 		 */
 		delete(where) {
@@ -163,9 +135,9 @@ module.exports = (app) => {
 
 		/**
 		 *
-		 * @param where
-		 * @param options
-		 * @param connections
+		 * @param where {Object}
+		 * @param options {Object}
+		 * @param connections {Object}
 		 * @returns {Promise}
 		 */
 		static read(where, options, connections) {
@@ -179,9 +151,9 @@ module.exports = (app) => {
 
 		/**
 		 * find element by id, rejects if not found
-		 * @param id
-		 * @param options
-		 * @param connections
+		 * @param {Object|string} id
+		 * @param {Object} options
+		 * @param {Object} connections
 		 * @returns {Promise}
 		 */
 		static byId(id, options, connections) {
@@ -190,10 +162,10 @@ module.exports = (app) => {
 
 		/**
 		 * find one element by {field}, rejects if not found
-		 * @param field
-		 * @param key
-		 * @param options
-		 * @param connections
+		 * @param {string} field
+		 * @param {Object} key
+		 * @param {Object} options
+		 * @param {Object} connections
 		 * @returns {Promise}
 		 */
 		static by(field, key, options, connections) {
@@ -273,6 +245,5 @@ module.exports = (app) => {
 			}
 			return objNew;
 		}
-
 	};
 };
