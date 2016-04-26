@@ -105,7 +105,7 @@ module.exports = (app) => {
 		 */
 		create() {
 			return this.prepare('create').then((data) => {
-				return app.db.collection(this.constructor.schema.name).insertOne(data);
+				return this.constructor.c.insertOne(data);
 			}).then((result) => {
 				this._id = result.ops[0]._id;
 				return this;
@@ -124,7 +124,7 @@ module.exports = (app) => {
 						$set: data
 					};
 				}
-				return app.db.collection(this.constructor.schema.name).updateOne(_.merge(where || {}, {
+				return this.constructor.c.updateOne(_.merge(where || {}, {
 					_id: this._id
 				}), data).then(() => {
 					return this;
@@ -142,7 +142,7 @@ module.exports = (app) => {
 				this.deleted = true;
 				return this.update(where);
 			} else {
-				return app.db.collection(this.constructor.schema.name).deleteOne(_.merge(where || {}, {
+				return this.constructor.c.deleteOne(_.merge(where || {}, {
 					_id: this._id
 				}));
 			}
@@ -157,6 +157,10 @@ module.exports = (app) => {
 			return Collection;
 		}
 
+		static get c() {
+			return app.db.collection(this.schema.name);
+		}
+
 		/**
 		 *
 		 * @param where
@@ -168,7 +172,7 @@ module.exports = (app) => {
 			//TODO join connections D:
 			where = where || {};
 			options = options || {};
-			return app.db.collection(this.schema.name).find(where, options).toArray().then((result) => {
+			return this.c.find(where, options).toArray().then((result) => {
 				return new this.Collection().wrap(result, this);
 			});
 		}
