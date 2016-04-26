@@ -44,15 +44,15 @@ module.exports = (app) => {
 
 			if (obj instanceof mongodb.ObjectId) {
 				result = obj.toString();
-			} else if (obj instanceof Object) {
-				result = {};
-				Object.keys(obj).forEach((prop) => {
-					result[prop] = this._toJSON(obj[prop]);
-				});
 			} else if (obj instanceof Array) {
 				result = [];
 				obj.forEach((item) => {
 					result.push(this._toJSON(item));
+				});
+			} else if (obj instanceof Object) {
+				result = {};
+				Object.keys(obj).forEach((prop) => {
+					result[prop] = this._toJSON(obj[prop]);
 				});
 			} else {
 				result = obj;
