@@ -16,7 +16,7 @@ module.exports = (app) => {
 			Object.keys(properties).forEach((prop) => {
 				this[prop] = properties[prop];
 			});
-			if (this._id) {
+			if (this._id && typeof this._id == 'string') {
 				this._id = this.constructor.prepareId(this._id);
 			}
 		}
