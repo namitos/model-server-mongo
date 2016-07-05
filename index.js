@@ -139,7 +139,7 @@ module.exports = (app) => {
 		}
 
 		/**
-		 *
+		 * getter for internal collection class
 		 * @returns {Collection}
 		 * @constructor
 		 */
@@ -147,6 +147,10 @@ module.exports = (app) => {
 			return Collection;
 		}
 
+		/**
+		 * getter for mongo collection instance
+		 * @returns {Object}
+		 */
 		static get c() {
 			return app.db.collection(this.schema.name);
 		}
@@ -165,6 +169,16 @@ module.exports = (app) => {
 			return this.c.find(where, options).toArray().then((result) => {
 				return new this.Collection().wrap(result, this);
 			});
+		}
+
+		/**
+		 *
+		 * @param where {Object}
+		 * @returns {Promise}
+		 */
+		static count(where) {
+			where = where || {};
+			return this.c.count(where);
 		}
 
 		/**
