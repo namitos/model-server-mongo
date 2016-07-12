@@ -93,6 +93,38 @@ describe('Model-server-mongo', function () {
 		}).catch(done);
 	});
 
+	it('byId found', function (done) {
+		init().then(function (TestModel) {
+			return new TestModel().create().then(function (item) {
+				return TestModel.byId(item._id);
+			})
+		}).then(function (item) {
+			done();
+		}).catch(done);
+	});
+
+	it('byId not found (reject)', function (done) {
+		init().then(function (TestModel) {
+			return TestModel.byId('56c329b829b58bc921b1e5fa')
+		}).then(function (item) {
+			done('must be not found');
+		}).catch(function (err) {
+			assert.equal(err, 'item not found');
+			done();
+		});
+	});
+
+	it('byId invalid id (reject)', function (done) {
+		init().then(function (TestModel) {
+			return TestModel.byId('123')
+		}).then(function (item) {
+			done('must be not found');
+		}).catch(function (err) {
+			assert.equal(err, 'invalid id');
+			done();
+		});
+	});
+
 	it('create', function (done) {
 		init().then(function (TestModel) {
 			return new TestModel({

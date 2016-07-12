@@ -198,7 +198,12 @@ module.exports = (app) => {
 		 * @returns {Promise}
 		 */
 		static byId(id, options, connections) {
-			return this.by('_id', this.prepareId(id), options, connections);
+			id = this.prepareId(id);
+			if (id) {
+				return this.by('_id', id, options, connections);
+			} else {
+				return Promise.reject('invalid id');
+			}
 		}
 
 		/**
