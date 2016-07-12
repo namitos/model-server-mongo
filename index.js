@@ -13,6 +13,7 @@ module.exports = (app) => {
 		 * @param {Object} properties
 		 */
 		constructor(properties) {
+			properties = properties || {};
 			Object.keys(properties).forEach((prop) => {
 				this[prop] = properties[prop];
 			});
@@ -108,18 +109,22 @@ module.exports = (app) => {
 		 * @returns {Promise}
 		 */
 		update(where) {
-			return this.prepare('update').then((data) => {
-				if (this.constructor.schema.updatePatch) {
-					data = {
-						$set: data
-					};
-				}
-				return this.constructor.c.updateOne(_.merge(where || {}, {
-					_id: this._id
-				}), data).then(() => {
-					return this;
+			if (this._id) {
+				return this.prepare('update').then((data) => {
+					if (this.constructor.schema.updatePatch) {
+						data = {
+							$set: data
+						};
+					}
+					return this.constructor.c.updateOne(_.merge(where || {}, {
+						_id: this._id
+					}), data).then(() => {
+						return this;
+					});
 				});
-			});
+			} else {
+				return Promise.reject('_id required for update');
+			}
 		}
 
 		/**
@@ -128,13 +133,17 @@ module.exports = (app) => {
 		 * @returns {Promise}
 		 */
 		delete(where) {
-			if (this.constructor.schema.safeDelete) {
-				this.deleted = true;
-				return this.update(where);
+			if (this._id) {
+				if (this.constructor.schema.safeDelete) {
+					this.deleted = true;
+					return this.update(where);
+				} else {
+					return this.constructor.c.deleteOne(_.merge(where || {}, {
+						_id: this._id
+					}));
+				}
 			} else {
-				return this.constructor.c.deleteOne(_.merge(where || {}, {
-					_id: this._id
-				}));
+				return Promise.reject('_id required for delete');
 			}
 		}
 

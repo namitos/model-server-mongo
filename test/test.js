@@ -136,11 +136,11 @@ describe('Model-server-mongo', function () {
 				c: true
 			}).create().then(function (item) {
 				item.a = 22222;
-				return item.update({aa: 22.22});//заведомо существующее условие
+				return item.update({aa: 22.22});//existent condition
 			}).then(function (item) {
-				return TestModel.byId(item._id);//читаем из базы заново, чтоб убедиться
+				return TestModel.byId(item._id);//reading from db again
 			}).then(function (item) {
-				assert.equal(22222, item.a);//должно обновиться
+				assert.equal(22222, item.a);//must be renewed
 				done();
 			});
 		}).catch(done);
@@ -155,13 +155,33 @@ describe('Model-server-mongo', function () {
 				c: true
 			}).create().then(function (item) {
 				item.a = 22222;
-				return item.update({aa: 9});//заведомо несуществующее условие
+				return item.update({aa: 9});//non-existent condition
 			}).then(function (item) {
-				return TestModel.byId(item._id);//читаем из базы заново, чтоб убедиться
+				return TestModel.byId(item._id);//reading from db again
 			}).then(function (item) {
-				assert.equal(22, item.a);//не должно обновиться
+				assert.equal(22, item.a);//must not be renewed
 				done();
 			});
+		}).catch(done);
+	});
+
+	it('delete model without _id (reject)', function (done) {
+		init().then(function (TestModel) {
+			return new TestModel().delete()//model without _id
+		}).then(function () {
+			done('must not be deleted');
+		}).catch(function () {
+			done();//must be rejected
+		});
+	});
+
+	it('delete model with _id (resolve)', function (done) {
+		init().then(function (TestModel) {
+			return new TestModel().create()
+		}).then(function (item) {
+			return item.delete()//model with _id
+		}).then(function () {
+			done()
 		}).catch(done);
 	});
 });
