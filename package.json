@@ -10,14 +10,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/namitos/Model-server-mongo.git"
+		"url": "git+https://github.com/namitos/model-server-mongo.git"
 	},
 	"author": "Artem Tankayan",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/namitos/Model-server-mongo/issues"
+		"url": "https://github.com/namitos/model-server-mongo/issues"
 	},
-	"homepage": "https://github.com/namitos/Model-server-mongo#readme",
+	"homepage": "https://github.com/namitos/model-server-mongo#readme",
 	"dependencies": {
 		"mongodb": "2.x",
 		"revalidator": "0.3.x",
