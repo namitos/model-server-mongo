@@ -12,13 +12,12 @@ module.exports = (app) => {
 		 * @constructor
 		 * @param {Object} properties
 		 */
-		constructor(properties) {
-			properties = properties || {};
+		constructor(properties = {}) {
 			Object.keys(properties).forEach((prop) => {
 				this[prop] = properties[prop];
 			});
 			if (this._id && typeof this._id == 'string') {
-				this._id = this.constructor.prepareId(this._id);
+				this._id = this.constructor.prepareIdSingle(this._id);
 			}
 		}
 
@@ -108,7 +107,7 @@ module.exports = (app) => {
 		 * @param {Object} where - sometimes we need in additional conditions in query.
 		 * @returns {Promise}
 		 */
-		update(where) {
+		update(where = {}) {
 			if (this._id) {
 				return this.prepare('update').then((data) => {
 					if (this.constructor.schema.updatePatch) {
@@ -116,7 +115,7 @@ module.exports = (app) => {
 							$set: data
 						};
 					}
-					return this.constructor.c.updateOne(_.merge(where || {}, {
+					return this.constructor.c.updateOne(_.merge(where, {
 						_id: this._id
 					}), data).then(() => {
 						return this;
@@ -132,13 +131,13 @@ module.exports = (app) => {
 		 * @param {Object} where - sometimes we need in additional conditions in query. for example, to update the record of a particular user, to avoid reading the document and comparison.
 		 * @returns {Promise}
 		 */
-		delete(where) {
+		delete(where = {}) {
 			if (this._id) {
 				if (this.constructor.schema.safeDelete) {
 					this.deleted = true;
 					return this.update(where);
 				} else {
-					return this.constructor.c.deleteOne(_.merge(where || {}, {
+					return this.constructor.c.deleteOne(_.merge(where, {
 						_id: this._id
 					}));
 				}
@@ -171,10 +170,8 @@ module.exports = (app) => {
 		 * @param connections {Object}
 		 * @returns {Promise}
 		 */
-		static read(where, options, connections) {
+		static read(where = {}, options = {}, connections) {
 			//TODO join connections D:
-			where = where || {};
-			options = options || {};
 			return this.c.find(where, options).toArray().then((result) => {
 				return new this.Collection().wrap(result, this);
 			});
@@ -186,7 +183,6 @@ module.exports = (app) => {
 		 * @returns {Promise}
 		 */
 		static count(where) {
-			where = where || {};
 			return this.c.count(where);
 		}
 
@@ -198,12 +194,8 @@ module.exports = (app) => {
 		 * @returns {Promise}
 		 */
 		static byId(id, options, connections) {
-			id = this.prepareId(id);
-			if (id) {
-				return this.by('_id', id, options, connections);
-			} else {
-				return Promise.reject('invalid id');
-			}
+			id = this.prepareIdSingle(id);
+			return id ? this.by('_id', id, options, connections) : Promise.reject('invalid id');
 		}
 
 		/**
@@ -218,33 +210,33 @@ module.exports = (app) => {
 			var where = {};
 			where[field] = key;
 			return this.read(where, options, connections).then((result) => {
-				return new Promise((resolve, reject) => {
-					if (result.length) {
-						resolve(result[0]);
-					} else {
-						reject('item not found');
-					}
-				});
+				return result.length ? result[0] : Promise.reject('item not found');
 			});
+		}
+
+		static prepareIdSingle(id) {
+			try {
+				return new mongodb.ObjectID(id);
+			} catch (err) {
+				console.error(id, err);
+			}
 		}
 
 		static prepareId(id) {
 			var newId;
-			try {
-				if (id instanceof Array) {
-					newId = [];
-					id.forEach((item, i) => {
-						newId.push(this.prepareId(item));
-					});
-				} else if (id instanceof Object && id.hasOwnProperty('$in')) {
-					newId = {
-						$in: this.prepareId(id.$in)
-					};
-				} else {
-					newId = new mongodb.ObjectID(id.toString());
-				}
-			} catch (err) {
-				console.error(id, err);
+			if (id instanceof Array) {
+				newId = [];
+				id.forEach((item, i) => {
+					newId.push(this.prepareIdSingle(item));
+				});
+			} else if (id instanceof Object && id.hasOwnProperty('$in')) {
+				newId = {
+					$in: this.prepareId(id.$in)
+				};
+			} else if (id) {
+				newId = this.prepareIdSingle(id);
+			} else {
+
 			}
 			return newId;
 		}

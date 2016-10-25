@@ -120,6 +120,7 @@ describe('Model-server-mongo', function () {
 		}).then(function (item) {
 			done('must be not found');
 		}).catch(function (err) {
+			console.log('this error must be here! its normal!');
 			assert.equal(err, 'invalid id');
 			done();
 		});
@@ -214,6 +215,15 @@ describe('Model-server-mongo', function () {
 			return item.delete()//model with _id
 		}).then(function () {
 			done()
+		}).catch(done);
+	});
+
+	it('count', function (done) {
+		init().then(function (TestModel) {
+			return TestModel.count()
+		}).then(function (count) {
+			assert.equal(true, typeof count == 'number');
+			done();
 		}).catch(done);
 	});
 });
