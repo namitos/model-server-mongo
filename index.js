@@ -158,12 +158,17 @@ module.exports = (app) => {
       return Collection;
     }
 
+
+    static get db() {
+      return app.db;
+    }
+
     /**
      * getter for mongo collection instance
      * @returns {Object}
      */
     static get c() {
-      return app.db.collection(this.schema.name);
+      return this.db.collection(this.schema.name);
     }
 
     /**
