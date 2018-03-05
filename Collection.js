@@ -1,4 +1,4 @@
-var _ = require('lodash');
+const _ = require('lodash');
 
 /**
  * Wrapper of array
@@ -23,7 +23,14 @@ class Collection extends Array {
     return this;
   }
 
-  async join({ model, l, r, as, single }) {
+  async join() {
+    try {
+      console.trace('Collection.join deprecated. use Collection.joinModels');
+    } catch (err) { console.error(err) }
+    return this.joinModels(...arguments);
+  }
+
+  async joinModels({ model, l, r, as, single, fields = {} }) {
     let keys = new Set();
     this.forEach((item) => {
       if (item.get(l)) {
@@ -32,7 +39,7 @@ class Collection extends Array {
     })
     let joinedItems = await model.read({
       [r]: { $in: [...keys] }
-    })
+    }, { fields })
     let groups = _.groupBy(joinedItems, r);
     this.forEach((item) => {
       if (single) {
