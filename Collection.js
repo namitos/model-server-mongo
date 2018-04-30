@@ -33,19 +33,34 @@ class Collection extends Array {
   async joinModels({ model, l, r, as, single, fields = {} }) {
     let keys = new Set();
     this.forEach((item) => {
-      if (item.get(l)) {
-        keys.add(r === '_id' ? model.prepareIdSingle(item.get(l)) : item.get(l).toString())
+      let key = item.get(l);
+      if (key instanceof Array) {
+        key = r === '_id' ? key.map((item) => model.prepareIdSingle(item)) : key.map((item) => item.toString());
+        key.forEach((k) => {
+          keys.add(k);
+        });
+      } else {
+        key = r === '_id' ? model.prepareIdSingle(key) : key.toString();
+        keys.add(key);
       }
-    })
+    });
     let joinedItems = await model.read({
       [r]: { $in: [...keys] }
     }, { fields })
     let groups = _.groupBy(joinedItems, r);
     this.forEach((item) => {
-      if (single) {
-        item[as] = groups[item.get(l)] ? groups[item.get(l)][0] : null
+      let key = item.get(l);
+      if (key instanceof Array) {
+        item[as] = [];
+        key.forEach((k) => {
+          item[as] = item[as].concat(groups[k]);
+        });
       } else {
-        item[as] = groups[item.get(l)]
+        if (single) {
+          item[as] = groups[key] ? groups[key][0] : null
+        } else {
+          item[as] = groups[key]
+        }
       }
     })
   }
