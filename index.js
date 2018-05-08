@@ -132,8 +132,7 @@ module.exports = (app) => {
     delete(where = {}) {
       if (this._id) {
         if (this.constructor.schema.safeDelete) {
-          this.deleted = true;
-          return this.update(where);
+          return this.constructor.c.updateOne(Object.assign(where, { _id: this._id }), { $set: { deleted: true } });
         } else {
           return this.constructor.c.deleteOne(Object.assign(where, { _id: this._id }));
         }
