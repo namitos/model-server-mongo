@@ -125,6 +125,20 @@ module.exports = (app) => {
     }
 
     /**
+     * 
+     * @param {Object} data query object
+     * @returns {Promise}
+     */
+    async updateQuery(data) {
+      if (this._id) {
+        await this.constructor.c.updateOne({ _id: this._id }, data);
+        return this;
+      } else {
+        return Promise.reject('_id required for update');
+      }
+    }
+
+    /**
      *
      * @param {Object} where - sometimes we need in additional conditions in query. for example, to update the record of a particular user, to avoid reading the document and comparison.
      * @returns {Promise}
