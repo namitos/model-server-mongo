@@ -150,7 +150,7 @@ describe('Model-server-mongo', function() {
         item.a = 22222;
         return item.update();
       }).then(function(item) {
-        return TestModel.byId(item._id); //читаем из базы заново, чтоб убедиться
+        return TestModel.byId(item._id);
       }).then(function(item) {
         assert.equal(22222, item.a);
         done();
@@ -191,6 +191,26 @@ describe('Model-server-mongo', function() {
         return TestModel.byId(item._id); //reading from db again
       }).then(function(item) {
         assert.equal(22, item.a); //must not be renewed
+        done();
+      });
+    }).catch(done);
+  });
+
+
+  it('updateQuery', function(done) {
+    var TestModel;
+    init().then(function(TestModel) {
+      return new TestModel({
+        a: 22,
+        aa: 22.22,
+        b: 'foo',
+        c: true
+      }).create().then(function(item) {
+        return item.updateQuery({ $inc: { a: 1 } });
+      }).then(function(item) {
+        return TestModel.byId(item._id);
+      }).then(function(item) {
+        assert.equal(23, item.a);
         done();
       });
     }).catch(done);
