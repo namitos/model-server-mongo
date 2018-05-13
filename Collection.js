@@ -34,14 +34,16 @@ class Collection extends Array {
     let keys = new Set();
     this.forEach((item) => {
       let key = item.get(l);
-      if (key instanceof Array) {
-        key = r === '_id' ? key.map((item) => model.prepareIdSingle(item)) : key.map((item) => item.toString());
-        key.forEach((k) => {
-          keys.add(k);
-        });
-      } else {
-        key = r === '_id' ? model.prepareIdSingle(key) : key.toString();
-        keys.add(key);
+      if (key) {
+        if (key instanceof Array) {
+          key = r === '_id' ? key.map((item) => model.prepareIdSingle(item)) : key.map((item) => item.toString());
+          key.forEach((k) => {
+            keys.add(k);
+          });
+        } else {
+          key = r === '_id' ? model.prepareIdSingle(key) : key.toString();
+          keys.add(key);
+        }
       }
     });
     let joinedItems = await model.read({
