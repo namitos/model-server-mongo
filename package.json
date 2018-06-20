@@ -1,32 +1,32 @@
 {
-	"name": "model-server-mongo",
-	"version": "1.2.8",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"test": "./node_modules/mocha/bin/mocha ./test/* --timeout 10000",
-		"test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*",
-		"docs": "rm -rf out/ && ./node_modules/jsdoc/jsdoc.js *.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/namitos/model-server-mongo.git"
-	},
-	"author": "Artem Tankayan",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/namitos/model-server-mongo/issues"
-	},
-	"homepage": "https://github.com/namitos/model-server-mongo#readme",
-	"dependencies": {
-		"mongodb": "2.x",
-		"revalidator": "0.3.x",
-		"lodash": "4.x"
-	},
-	"devDependencies": {
-		"mocha": "2.x",
-		"istanbul": "0.4.x",
-		"coveralls": "2.x",
-		"jsdoc": "3.x"
-	}
+  "name": "model-server-mongo",
+  "version": "2.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha ./test/* --timeout 10000",
+    "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*",
+    "docs": "rm -rf out/ && ./node_modules/jsdoc/jsdoc.js *.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/namitos/model-server-mongo.git"
+  },
+  "author": "Artem Tankayan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/namitos/model-server-mongo/issues"
+  },
+  "homepage": "https://github.com/namitos/model-server-mongo#readme",
+  "dependencies": {
+    "lodash": "^4.17.10",
+    "mongodb": "^3.0.10",
+    "revalidator": "^0.3.1"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.1",
+    "istanbul": "^0.4.5",
+    "jsdoc": "^3.5.5",
+    "mocha": "^5.2.0"
+  }
 }

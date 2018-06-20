@@ -23,13 +23,16 @@ class Collection extends Array {
     return this;
   }
 
-  async join() {
-    try {
-      console.trace('Collection.join deprecated. use Collection.joinModels');
-    } catch (err) { console.error(err) }
-    return this.joinModels(...arguments);
-  }
-
+  /**
+   * 
+   * @param {Object} param0
+   * @param {Object} param0.model model to join 
+   * @param {String} param0.l 
+   * @param {String} param0.r
+   * @param {String} param0.as field, where we store joined documents
+   * @param {Boolean} param0.single "single document or array" flag
+   * @param {Object} param0.fields mongodb fields parameter
+   */
   async joinModels({ model, l, r, as, single, fields = {} }) {
     let keys = new Set();
     this.forEach((item) => {
@@ -65,14 +68,6 @@ class Collection extends Array {
         }
       }
     })
-  }
-
-  /**
-   * lodash wrapper
-   * @returns {Object}
-   */
-  get _() {
-    return _(this);
   }
 }
 

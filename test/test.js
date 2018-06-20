@@ -2,13 +2,12 @@
 
 process.env.DBAUTH = process.env.DBAUTH || '';
 
-var assert = require('assert');
-var mongodb = require('mongodb');
-var factory = require('../');
+const assert = require('assert');
+const mongodb = require('mongodb');
+const Model = require('../');
 
-function init() {
-  return mongodb.MongoClient.connect(`mongodb://${process.env.DBAUTH}127.0.0.1:27017/test-msm`).then(function(db) {
-    var Model = factory({ db: db });
+async function init() {
+  return mongodb.MongoClient.connect(`mongodb://${process.env.DBAUTH}127.0.0.1:27017`).then(function(client) {
     return class TestModel extends Model {
       static get schema() {
         return {
@@ -29,6 +28,10 @@ function init() {
             }
           }
         }
+      }
+
+      static get db() {
+        return client.db('test-msm');
       }
     }
   });
@@ -55,8 +58,6 @@ describe('Model-server-mongo', function() {
       var obj = {};
       obj.c = undVar;
       assert.equal(false, TestModel.forceSchema(TestModel.schema, obj).c);
-      assert.equal(false, TestModel.forceSchema(TestModel.schema, { c: '0' }).c);
-      assert.equal(false, TestModel.forceSchema(TestModel.schema, { c: 'false' }).c);
       assert.equal(false, TestModel.forceSchema(TestModel.schema, { c: '' }).c);
       assert.equal(false, TestModel.forceSchema(TestModel.schema, { c: false }).c);
       assert.equal(false, TestModel.forceSchema(TestModel.schema, { c: null }).c);
@@ -107,7 +108,7 @@ describe('Model-server-mongo', function() {
     }).then(function(item) {
       done('must be not found');
     }).catch(function(err) {
-      assert.equal(err, 'item not found');
+      assert.equal(err.text, 'not found');
       done();
     });
   });
@@ -119,7 +120,7 @@ describe('Model-server-mongo', function() {
       done('must be not found');
     }).catch(function(err) {
       console.log('this error must be here! its normal!');
-      assert.equal(err, 'invalid id');
+      assert.equal(err.text, 'invalid id');
       done();
     });
   });
