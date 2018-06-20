@@ -9,4 +9,4 @@ before_script:
   - sleep 15
   - mongo test-msm --eval 'db.createUser({user:"test",pwd:"pass",roles:["readWrite"]});'
 script: "npm run-script test-travis"
-after_script: "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+after_success: npm run coverage
