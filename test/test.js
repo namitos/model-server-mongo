@@ -2,6 +2,8 @@
 
 process.env.DBAUTH = process.env.DBAUTH || '';
 
+console.log('process.env.DBAUTH', process.env.DBAUTH);
+
 const assert = require('assert');
 const mongodb = require('mongodb');
 const Model = require('../');
