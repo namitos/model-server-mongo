@@ -9,7 +9,7 @@ const mongodb = require('mongodb');
 const Model = require('../');
 
 async function init() {
-  return mongodb.MongoClient.connect(`mongodb://${process.env.DBAUTH}127.0.0.1:27017`).then(function(client) {
+  return mongodb.MongoClient.connect(`mongodb://${process.env.DBAUTH}127.0.0.1:27017/test-msm`).then(function(client) {
     return class TestModel extends Model {
       static get schema() {
         return {
