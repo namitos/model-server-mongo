@@ -2,7 +2,7 @@ const revalidator = require('revalidator');
 const mongodb = require('mongodb');
 const Collection = require('./Collection');
 
-module.exports = class Model {
+module.exports = ({ db }) => class Model {
   /**
    * @constructor
    * @param {Object} properties
@@ -152,7 +152,7 @@ module.exports = class Model {
 
 
   static get db() {
-    throw { type: 'OdmError', text: 'db getter not exists' }
+    return db;
   }
 
   /**

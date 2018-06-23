@@ -9,7 +9,7 @@ const Model = require('../');
 async function init() {
   // /test-msm - where we must authenticate
   let client = await mongodb.MongoClient.connect(`mongodb://${process.env.DBAUTH}127.0.0.1:27017/test-msm`);
-  let TestModel = class TestModel extends Model {
+  let TestModel = class TestModel extends Model({ db: client.db('test-msm') }) {
     static get schema() {
       return {
         type: 'object',
@@ -29,10 +29,6 @@ async function init() {
           }
         }
       }
-    }
-
-    static get db() {
-      return client.db('test-msm');
     }
   }
 
