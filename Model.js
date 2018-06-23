@@ -42,6 +42,13 @@ module.exports = ({ db }) => class Model {
     return this.constructor._toJSON(this);
   }
 
+  get(path, o) {
+    if (typeof path === 'string') {
+      path = path.split('.');
+    }
+    return path.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+  }
+
   /**
    * prepares the object to database
    * @param {string} op
