@@ -1,5 +1,5 @@
 const revalidator = require('revalidator');
-const mongodb = require('mongodb');
+const { ObjectID } = require('mongodb');
 const Collection = require('./Collection');
 
 module.exports = ({ db }) => class Model {
@@ -16,7 +16,7 @@ module.exports = ({ db }) => class Model {
 
   static _toJSON(obj) {
     let result;
-    if (obj instanceof mongodb.ObjectID) {
+    if (obj instanceof ObjectID) {
       result = obj.toString();
     } else if (obj instanceof Array) {
       result = [];
@@ -42,6 +42,11 @@ module.exports = ({ db }) => class Model {
     return this.constructor._toJSON(this);
   }
 
+  /**
+   * safe deep get
+   * @param {Array} path 
+   * @param {*} o default value
+   */
   get(path, o) {
     if (typeof path === 'string') {
       path = path.split('.');
@@ -71,7 +76,7 @@ module.exports = ({ db }) => class Model {
       return data;
     } else {
       return Promise.reject({
-        type: 'OdmError',
+        name: 'OdmError',
         text: 'validation',
         data: validation.errors
       });
@@ -101,7 +106,7 @@ module.exports = ({ db }) => class Model {
       return this;
     } else {
       return Promise.reject({
-        type: 'OdmError',
+        name: 'OdmError',
         text: '_id required for update'
       });
     }
@@ -118,7 +123,7 @@ module.exports = ({ db }) => class Model {
       return this;
     } else {
       return Promise.reject({
-        type: 'OdmError',
+        name: 'OdmError',
         text: '_id required for update'
       });
     }
@@ -138,7 +143,7 @@ module.exports = ({ db }) => class Model {
       }
     } else {
       return Promise.reject({
-        type: 'OdmError',
+        name: 'OdmError',
         text: '_id required for delete'
       });
     }
@@ -187,7 +192,7 @@ module.exports = ({ db }) => class Model {
    * @returns {Promise}
    */
   static count(where) {
-    return this.c.count(where);
+    return this.c.countDocuments(where);
   }
 
   /**
@@ -200,15 +205,15 @@ module.exports = ({ db }) => class Model {
     id = this.prepareIdSingle(id);
     if (id) {
       let [item] = await this.read({ _id: id }, options);
-      return item ? item : Promise.reject({ type: 'OdmError', text: 'not found' });
+      return item || Promise.reject({ name: 'OdmError', text: 'not found' });
     } else {
-      return Promise.reject({ type: 'OdmError', text: 'invalid id' });
+      return Promise.reject({ name: 'OdmError', text: 'invalid id' });
     }
   }
 
   static prepareIdSingle(id) {
     try {
-      return new mongodb.ObjectID(id);
+      return new ObjectID(id);
     } catch (err) {
       console.error(id, err);
     }
