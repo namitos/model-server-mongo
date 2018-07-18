@@ -45,13 +45,12 @@ module.exports = ({ db }) => class Model {
   /**
    * safe deep get
    * @param {Array} path 
-   * @param {*} o default value
    */
-  get(path, o) {
+  get(path) {
     if (typeof path === 'string') {
       path = path.split('.');
     }
-    return path.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+    return path.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, this)
   }
 
   /**
