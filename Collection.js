@@ -58,13 +58,15 @@ class Collection extends Array {
       if (key instanceof Array) {
         item[as] = [];
         key.forEach((k) => {
-          item[as] = item[as].concat(groups[k]);
+          if (groups[k]) {
+            item[as] = item[as].concat(groups[k]);
+          }
         });
       } else {
         if (single) {
           item[as] = groups[key] ? groups[key][0] : null
         } else {
-          item[as] = groups[key]
+          item[as] = groups[key] ? groups[key] : []
         }
       }
     })
