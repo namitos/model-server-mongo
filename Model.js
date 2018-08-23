@@ -181,6 +181,10 @@ module.exports = ({ db }) => class Model {
    * @returns {Promise}
    */
   static async read(where = {}, options = {}) {
+    if (options.fields) {
+      options.select = options.fields;
+      delete options.fields;
+    }
     let r = await this.c.find(where, options).toArray();
     return new this.Collection().wrap(r, this);
   }
