@@ -10,15 +10,9 @@ class Collection extends Array {
    * @param Model
    * @returns {Collection}
    */
-  wrap(items, Model) {
-    if (items && items.length) {
-      items.forEach((item) => {
-        if (item instanceof Model) {
-          this.push(item);
-        } else {
-          this.push(new Model(item));
-        }
-      });
+  wrap(items = [], Model) {
+    for (let i = 0, iL = items.length; i < iL; ++i) {
+      this.push(new Model(items[i]));
     }
     return this;
   }
@@ -35,33 +29,36 @@ class Collection extends Array {
    */
   async joinModels({ model, l, r, as, single, fields = {} }) {
     let keys = new Set();
-    this.forEach((item) => {
+    for (let i = 0, iL = this.length; i < iL; ++i) {
+      let item = this[i];
       let key = item.get(l);
       if (key) {
         if (key instanceof Array) {
           key = r === '_id' ? key.map((item) => model.prepareIdSingle(item)) : key.map((item) => item.toString());
-          key.forEach((k) => {
-            keys.add(k);
-          });
+          for (let j = 0, jL = key.length; j < jL; ++j) {
+            keys.add(key[j]);
+          }
         } else {
           key = r === '_id' ? model.prepareIdSingle(key) : key.toString();
           keys.add(key);
         }
       }
-    });
+    }
     let joinedItems = await model.read({
       [r]: { $in: [...keys] }
     }, { fields })
     let groups = _.groupBy(joinedItems, r);
-    this.forEach((item) => {
+    for (let i = 0, iL = this.length; i < iL; ++i) {
+      let item = this[i];
       let key = item.get(l);
       if (key instanceof Array) {
         item[as] = [];
-        key.forEach((k) => {
+        for (let j = 0, jL = key.length; j < jL; ++j) {
+          let k = key[j];
           if (groups[k]) {
             item[as] = item[as].concat(groups[k]);
           }
-        });
+        }
       } else {
         if (single) {
           item[as] = groups[key] ? groups[key][0] : null
@@ -69,7 +66,7 @@ class Collection extends Array {
           item[as] = groups[key] ? groups[key] : []
         }
       }
-    })
+    }
   }
 }
 

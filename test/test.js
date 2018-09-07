@@ -26,6 +26,18 @@ async function init() {
           },
           c: {
             type: 'boolean'
+          },
+          d: {
+            type: 'object',
+            properties: {
+              a: {
+                type: 'integer'
+              }
+            }
+          },
+          e: {
+            type: 'array',
+            items: { type: 'string' }
           }
         }
       }
@@ -238,4 +250,42 @@ describe('Model-server-mongo', function() {
 
     client.close();
   });
+
+  //todo make more complex
+  it('toJSON', async function() {
+    let { client, TestModel } = await init();
+
+    let item = await new TestModel({
+      a: 22,
+      aa: 22.22,
+      b: 'foo',
+      c: true,
+      d: { a: 123 }
+    }).create();
+    //console.log(item.toJSON());
+
+    client.close();
+  });
+
+  //todo make more complex
+  it('joinModels', async function() {
+    let { client, TestModel } = await init();
+
+    let item = await new TestModel({
+      a: 11,
+      e: ['foo']
+    }).create();
+
+    let items = await TestModel.read({ a: 11 });
+    await items.joinModels({
+      model: TestModel,
+      l: 'e',
+      r: 'b',
+      as: '_items'
+    });
+    //console.log(items);
+
+    client.close();
+  });
+
 });

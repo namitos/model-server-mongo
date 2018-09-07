@@ -20,14 +20,16 @@ module.exports = ({ db }) => class Model {
       result = obj.toString();
     } else if (obj instanceof Array) {
       result = [];
-      obj.forEach((item) => {
-        result.push(this._toJSON(item));
-      });
+      for (let i = 0, iL = obj.length; i < iL; ++i) {
+        result.push(this._toJSON(obj[i]));
+      }
     } else if (obj instanceof Object) {
       result = {};
-      Object.keys(obj).forEach((prop) => {
+      let objKeys = Object.keys(obj);
+      for (let i = 0, iL = objKeys.length; i < iL; ++i) {
+        let prop = objKeys[i];
         result[prop] = this._toJSON(obj[prop]);
-      });
+      }
     } else {
       result = obj;
     }
