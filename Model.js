@@ -275,8 +275,10 @@ module.exports = ({ db }) =>
       } else if (schema.type === 'number') {
         objNew = parseFloat(obj) || 0;
       } else if (schema.type === 'string') {
-        if (obj) {
-          objNew = typeof obj === 'string' ? obj : obj.toString();
+        if (typeof obj === 'string') {
+          objNew = obj;
+        } else {
+          objNew = obj ? obj.toString() : '';
         }
       } else if (schema.type === 'boolean') {
         objNew = !!obj;
