@@ -273,7 +273,7 @@ module.exports = ({ db }) =>
       } else if (schema.type === 'integer') {
         objNew = parseInt(obj) || 0;
       } else if (schema.type === 'number') {
-        objNew = parseFloat(obj) || 0;
+        objNew = Number(obj) || 0;
       } else if (schema.type === 'string') {
         if (typeof obj === 'string') {
           objNew = obj;
