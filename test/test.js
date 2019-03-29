@@ -8,7 +8,7 @@ const Model = require('../');
 
 async function init() {
   // /test-msm - where we must authenticate
-  let client = await mongodb.MongoClient.connect(`mongodb://${process.env.DBAUTH}127.0.0.1:27017/test-msm`);
+  let client = await mongodb.MongoClient.connect(`mongodb://${process.env.DBAUTH}127.0.0.1:27017/test-msm`, { useNewUrlParser: true });
   let TestModel = class TestModel extends Model({ db: client.db('test-msm') }) {
     static get schema() {
       return {
@@ -40,11 +40,11 @@ async function init() {
             items: { type: 'string' }
           }
         }
-      }
+      };
     }
-  }
+  };
 
-  return { client, TestModel }
+  return { client, TestModel };
 }
 
 describe('Model-server-mongo', function() {
@@ -59,9 +59,7 @@ describe('Model-server-mongo', function() {
     assert.equal(999, TestModel.forceSchema(TestModel.schema, { a: 999 }).a);
     assert.equal(999, TestModel.forceSchema(TestModel.schema, { a: '999' }).a);
     assert.equal(999, TestModel.forceSchema(TestModel.schema, { a: '999.999' }).a);
-
     assert.equal(999.999, TestModel.forceSchema(TestModel.schema, { aa: '999.999' }).aa);
-
     assert.equal('999.999', TestModel.forceSchema(TestModel.schema, { b: 999.999 }).b);
 
     var undVar;
@@ -144,16 +142,6 @@ describe('Model-server-mongo', function() {
     client.close();
   });
 
-
-
-
-
-
-
-
-
-
-
   it('update', async function() {
     let { client, TestModel } = await init();
     let item = await new TestModel({
@@ -204,7 +192,6 @@ describe('Model-server-mongo', function() {
     client.close();
   });
 
-
   it('updateQuery', async function() {
     let { client, TestModel } = await init();
 
@@ -225,7 +212,7 @@ describe('Model-server-mongo', function() {
     let { client, TestModel } = await init();
 
     try {
-      await new TestModel().delete() //model without _id
+      await new TestModel().delete(); //model without _id
     } catch (err) {
       assert.equal(err.text, '_id required for delete');
     }
@@ -237,7 +224,7 @@ describe('Model-server-mongo', function() {
     let { client, TestModel } = await init();
 
     let item = await new TestModel().create();
-    await item.delete() //model with _id
+    await item.delete(); //model with _id
 
     client.close();
   });
@@ -287,5 +274,4 @@ describe('Model-server-mongo', function() {
 
     client.close();
   });
-
 });
