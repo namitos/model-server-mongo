@@ -237,8 +237,13 @@ module.exports = ({ db }) =>
         newId = {
           $in: this.prepareId(id.$in)
         };
+      } else if (id instanceof Object && id.hasOwnProperty('$nin')) {
+        newId = {
+          $nin: this.prepareId(id.$nin)
+        };
       } else if (id) {
         newId = this.prepareIdSingle(id);
+      } else {
       }
       return newId;
     }
