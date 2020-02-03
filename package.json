@@ -21,7 +21,7 @@
   "homepage": "https://github.com/namitos/model-server-mongo#readme",
   "dependencies": {
     "lodash": "^4.17.10",
-    "mongodb": "^3.2.2",
+    "mongodb": "^3.5.2",
     "revalidator": "^0.3.1"
   },
   "devDependencies": {
