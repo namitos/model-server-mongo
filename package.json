@@ -19,7 +19,7 @@
 	},
 	"homepage": "https://github.com/namitos/model-server-mongo#readme",
 	"dependencies": {
-		"mongodb": "2.x",
+		"mongodb": "3.x",
 		"revalidator": "0.3.x",
 		"lodash": "4.x"
 	},
