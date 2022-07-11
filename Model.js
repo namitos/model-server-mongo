@@ -94,7 +94,7 @@ module.exports = ({ db }) =>
     async create() {
       let data = await this.prepare('create');
       let r = await this.constructor.c.insertOne(data);
-      this._id = r.ops[0]._id;
+      this._id = r.insertedId;
       return this;
     }
 
